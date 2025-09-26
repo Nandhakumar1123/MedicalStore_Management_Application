@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Billing</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background:white;
+            padding: 20px;
+        }
+        nav {
+            background:blue;
+            padding: 10px;
+            text-align: center;
+        }
+        nav a {
+            color: white;
+            margin: 0 15px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .invoice {
+            background: white;
+            padding: 20px;
+            max-width: 600px;
+            margin: auto;
+            border-radius: 10px;
+            box-shadow: 0 0 10px #ccc;
+        }
+        h2 {
+            text-align: center;
+            color:blue;
+        }
+        label, input, select {
+            display: block;
+            margin: 10px 0 2px;
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        .error {
+            color: red;
+            font-size: 0.9em;
+            display: none;
+            margin-top: -8px;
+            margin-bottom: 8px;
+        }
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #aaa;
+            padding: 8px;
+            text-align: center;
+        }
+        #grandTotal {
+            font-weight: bold;
+            margin-top: 10px;
+            text-align: right;
+        }
+        footer {
+            text-align: center;
+            padding: 15px;
+            background-color:blue;
+            color: white;
+            margin-top: 40px;
+        }
+        button {
+            margin-top: 15px;
+            padding: 10px;
+            width: 30%;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            color: white;
+        }
+        #btnAdd { background-color:green; float: left; }
+        #btnSubmit { background-color:orange; float: left; margin-left: 5%; }
+        #btnBilling { background-color:red; float: right; }
+        .clearfix::after { content: ""; clear: both; display: table; }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="/dashboard">Dashboard</a>
+        <a href="/medicines">Medicines</a>
+        <a href="/add_medicine">Add Medicines</a>
+        <a href="/billing">Billing</a>
+        <a href="/report">Reports</a>
+    </nav>
+
+    <div class="invoice">
+        <h2>Customer Invoice</h2>
+
+        <!-- Customer Details -->
+        <label>User ID:
+            <input type="text" id="user_id" placeholder="Enter your User ID">
+        </label>
+        <span id="userIdError" class="error">User ID must be a number.</span>
+
+        <label>Customer Name:
+            <input type="text" id="customer_name" placeholder="Enter customer name">
+        </label>
+        <span id="nameError" class="error">Customer Name is required.</span>
+
+        <label>Mobile Number:
+            <input type="tel" id="mobile_number" placeholder="Enter mobile number">
+        </label>
+        <span id="mobileError" class="error">Mobile number must be exactly 10 digits.</span>
+
+        <label>District:
+            <input type="text" id="district" placeholder="Enter district">
+        </label>
+        <span id="districtError" class="error">District must contain only letters.</span>
+
+        <!-- Medicine Details -->
+        <label>Medicine ID:
+            <input type="number" id="medicine_id" placeholder="Enter medicine ID" oninput="syncMedicineById()">
+        </label>
+        <label>Medicine Name:
+            <input type="text" id="name" placeholder="Enter medicine name" oninput="updatePriceAndTotal()">
+        </label>
+        <label>Quantity:
+            <input type="number" id="qty" min="1" value="1" oninput="updatePriceAndTotal()">
+        </label>
+        <label>Price (Rs):
+            <input type="number" id="price" readonly>
+        </label>
+        <label>Total (Rs):
+            <input type="number" id="totalPrice" readonly>
+        </label>
+        <span id="medicineError" class="error">Please select a valid medicine and quantity.</span>
+
+        <!-- Buttons -->
+        <div class="clearfix">
+            <button type="button" id="btnAdd" onclick="addtoinvoice()">Add Item</button>
+            <button type="button" id="btnSubmit" onclick="submitInvoice()">Submit Invoice</button>
+            <button type="button" id="btnBilling" onclick="finalBilling()">Billing</button>
+        </div>
+
+        <!-- Invoice Table -->
+        <table id="invoiceTable">
+            <tr>
+                <th>Medicine</th>
+                <th>Qty</th>
+                <th>Unit Price</th>
+                <th>Total</th>
+            </tr>
+        </table>
+
+        <div id="grandTotal">Grand Total: Rs. 0.00</div>
+    </div>
+
+    <footer>&copy; 2025 Medical Store | Nandhakumar</footer>
+
+    <script>
+        const medicineList = {
+            1: { name: "paracetamol", price: 10.00 },
+            2: { name: "amoxicillin", price: 25.05 },
+            3: { name: "ibuprofen", price: 15.00 },
+            4: { name: "cetirizine", price: 8.00 },
+            5: { name: "azithromycin", price: 45.00 },
+            6: { name: "vitamin d", price: 25.00 },
+            7: { name: "vitamin h", price: 90.00 },
+            8:{ name:"metformin", price:78.00 }
+            
+        };
+
+        let grandTotal = 0;
+        let invoiceItems = [];
+
+        function syncMedicineById() {
+            const id = parseInt(document.getElementById("medicine_id").value);
+            if (medicineList[id]) {
+                document.getElementById("name").value = medicineList[id].name;
+                document.getElementById("price").value = medicineList[id].price.toFixed(2);
+                updatePriceAndTotal();
+            } else {
+                document.getElementById("name").value = "";
+                document.getElementById("price").value = "";
+                document.getElementById("totalPrice").value = "";
+            }
+        }
+
+        function updatePriceAndTotal() {
+            const nameInput = document.getElementById("name").value.trim().toLowerCase();
+            const qty = parseInt(document.getElementById("qty").value) || 0;
+            let found = false;
+            for (const id in medicineList) {
+                if (medicineList[id].name === nameInput) {
+                    document.getElementById("medicine_id").value = id;
+                    document.getElementById("price").value = medicineList[id].price.toFixed(2);
+                    document.getElementById("totalPrice").value = (medicineList[id].price * qty).toFixed(2);
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                document.getElementById("price").value = "";
+                document.getElementById("totalPrice").value = "";
+            }
+        }
+
+        function addtoinvoice() {
+            const medId = document.getElementById("medicine_id").value.trim();
+            const nameRaw = document.getElementById("name").value.trim();
+            const qty = parseInt(document.getElementById("qty").value);
+            const price = parseFloat(document.getElementById("price").value);
+            const total = parseFloat(document.getElementById("totalPrice").value);
+
+            document.getElementById("medicineError").style.display = "none";
+
+            if (!medId || !nameRaw || !price || !qty || qty <= 0) {
+                document.getElementById("medicineError").style.display = "block";
+                return;
+            }
+
+            const name = nameRaw.charAt(0).toUpperCase() + nameRaw.slice(1);
+            invoiceItems.push({ medId, name, qty, price, total });
+
+            const table = document.getElementById("invoiceTable");
+            const row = table.insertRow();
+            row.innerHTML = `<td>${medId} - ${name}</td><td>${qty}</td><td>${price.toFixed(2)}</td><td>${total.toFixed(2)}</td>`;
+
+            grandTotal += total;
+            document.getElementById("grandTotal").textContent = "Grand Total: Rs. " + grandTotal.toFixed(2);
+
+            document.getElementById("medicine_id").value = "";
+            document.getElementById("name").value = "";
+            document.getElementById("qty").value = 1;
+            document.getElementById("price").value = "";
+            document.getElementById("totalPrice").value = "";
+        }
+
+        function submitInvoice() {
+            if (invoiceItems.length === 0) return alert("Add at least one item.");
+            if (!validateCustomerDetails()) return;
+            alert("Invoice submitted successfully! You can now click Billing for details.");
+        }
+
+        async function finalBilling() {
+            if (invoiceItems.length === 0) return alert("Add some items first.");
+            if (!validateCustomerDetails()) return;
+
+            const billingData = {
+                user_id: document.getElementById("user_id").value.trim(),
+                customer_name: document.getElementById("customer_name").value.trim(),
+                mobile_number: document.getElementById("mobile_number").value.trim(),
+                district: document.getElementById("district").value.trim(),
+                items: invoiceItems,
+                add_date: new Date().toISOString()
+            };
+
+            try {
+                const response = await fetch("/billing", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(billingData)
+                });
+
+                if (response.ok) {
+                    const resultHtml = await response.text();
+                    const newTab = window.open("", "_blank");
+                    newTab.document.write(resultHtml);
+                } else {
+                    const error = await response.text();
+                    alert("Server error: " + error);
+                }
+            } catch (err) {
+                alert("Request failed: " + err.message);
+            }
+
+            localStorage.setItem("billingData", JSON.stringify(billingData));
+        }
+
+        function validateCustomerDetails() {
+            const userId = document.getElementById("user_id").value.trim();
+            const name = document.getElementById("customer_name").value.trim();
+            const mobile = document.getElementById("mobile_number").value.trim();
+            const district = document.getElementById("district").value.trim();
+
+            const userIdValid = /^\d+$/.test(userId);
+            const mobileValid = /^\d{10}$/.test(mobile);
+            const districtValid = /^[a-zA-Z\s]+$/.test(district);
+
+            document.getElementById("userIdError").style.display = "none";
+            document.getElementById("nameError").style.display = "none";
+            document.getElementById("mobileError").style.display = "none";
+            document.getElementById("districtError").style.display = "none";
+
+            let valid = true;
+
+            if (!userIdValid) {
+                document.getElementById("userIdError").style.display = "block";
+                valid = false;
+            }
+            if (!name) {
+                document.getElementById("nameError").style.display = "block";
+                valid = false;
+            }
+            if (!mobileValid) {
+                document.getElementById("mobileError").style.display = "block";
+                valid = false;
+            }
+            if (!districtValid) {
+                document.getElementById("districtError").style.display = "block";
+                valid = false;
+            }
+
+            return valid;
+        }
+    </script>
+</body>
+</html>
