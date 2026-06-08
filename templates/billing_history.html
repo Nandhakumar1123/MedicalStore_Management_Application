@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Billing History</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f8ff;
+            margin: 0;
+            padding: 20px;
+        }
+        header {
+            background: linear-gradient(90deg, #0066cc, #004080);
+            padding: 15px;
+            text-align: center;
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+        }
+        .container {
+            max-width: 1000px;
+            margin: auto;
+            padding: 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        h2 {
+            text-align: center;
+            color: #004080;
+            margin-bottom: 20px;
+        }
+        .search-form {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .search-form input[type="text"] {
+            padding: 8px 12px;
+            width: 300px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 15px;
+        }
+        .search-form button {
+            padding: 8px 15px;
+            border: none;
+            background: #0066cc;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 15px;
+            transition: 0.3s;
+        }
+        .search-form button:hover {
+            background: #004080;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: center;
+            font-size: 14px;
+        }
+        th {
+            background-color: #0066cc;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background: #f2f6fc;
+        }
+        tr:hover {
+            background: #e6f0ff;
+        }
+        .buttons {
+            margin: 20px 0;
+            text-align: center;
+        }
+        .buttons button, .back-btn a {
+            padding: 10px 22px;
+            margin: 0 10px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 15px;
+            transition: 0.3s;
+        }
+        .buttons button {
+            background-color: #28a745;
+            color: white;
+        }
+        .buttons button:hover {
+            background-color: #1e7e34;
+        }
+        .back-btn a {
+            background-color: #004080;
+            color: white;
+            text-decoration: none;
+        }
+        .back-btn a:hover {
+            background-color: #00264d;
+        }
+    </style>
+</head>
+<body>
+    <header>Billing History</header>
+    <div class="container">
+        <h2>All Billing Records</h2>
+
+        <!-- Search Form -->
+        <div class="search-form">
+            <form method="get" action="/billing_history">
+                <input type="text" name="q" placeholder="Search by customer, medicine, or date" value="{{ search_query if search_query }}">
+                <button type="submit">Search 🔍</button>
+            </form>
+        </div>
+
+        <!-- Print Button -->
+        <div class="buttons">
+            <button onclick="window.print()">🖨️ Print Billing History</button>
+        </div>
+
+        {% if records %}
+        <table id="billingTable">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Customer Name</th>
+                    <th>Mobile</th>
+                    <th>District</th>
+                    <th>Medicine Name</th>
+                    <th>Quantity</th>
+                    <th>Price (₹)</th>
+                    <th>Total (₹)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in records %}
+                <tr>
+                    <td>{{ record.date.strftime("%d-%m-%Y") if record.date else "N/A" }}</td>
+                    <td>{{ record.name }}</td>
+                    <td>{{ record.phonenum }}</td>
+                    <td>{{ record.district }}</td>
+                    <td>{{ record.medicine_name }}</td>
+                    <td>{{ record.quantity }}</td>
+                    <td>{{ record.price }}</td>
+                    <td>{{ record.total_price }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+            <p style="text-align:center; color:red;">No billing records found.</p>
+        {% endif %}
+
+        <!-- Back Button -->
+        <div class="back-btn">
+            <a href="/dashboard">← Back to Dashboard</a>
+        </div>
+    </div>
+</body>
+</html>

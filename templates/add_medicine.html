@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Medicine</title>
+    <style>
+        body {
+            font-family: "Segoe UI", Tahoma, sans-serif;
+            background: #eef2f7;
+            margin: 0;
+            padding: 0;
+        }
+        nav {
+            background: linear-gradient(90deg, #0056b3, #007bff);
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+        nav a {
+            color: white;
+            margin: 0 18px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 16px;
+            transition: color 0.3s, border-bottom 0.3s;
+            padding-bottom: 5px;
+        }
+        nav a:hover {
+            color: #ffeb3b;
+            border-bottom: 2px solid #ffeb3b;
+        }
+        form {
+            background: white;
+            max-width: 450px;
+            margin: 50px auto;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+        }
+        h2 {
+            text-align: center;
+            color: #0056b3;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: 600;
+            color: #333;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 6px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        input:focus {
+            border-color: #007bff;
+            outline: none;
+            box-shadow: 0 0 5px rgba(0,123,255,0.4);
+        }
+        button {
+            margin-top: 25px;
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(90deg, #0056b3, #007bff);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: linear-gradient(90deg, #00408a, #0065d4);
+        }
+        .error-msg {
+            color: red;
+            font-size: 13px;
+            margin-top: 5px;
+        }
+        footer {
+            text-align: center;
+            padding: 18px;
+            background: linear-gradient(90deg, #0056b3, #007bff);
+            color: white;
+            margin-top: 50px;
+            box-shadow: 0 -2px 6px rgba(0,0,0,0.2);
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+<nav>
+    <a href="/dashboard">Dashboard</a>
+    <a href="/medicines">Medicines</a>
+    <a href="/add_medicine">Add Medicines</a>
+    <a href="/billing">Billing</a>
+    <a href="/report">Reports</a>
+</nav>
+
+<form id="addMedicineForm">
+    <h2>Add New Medicine</h2>
+    <label>ID:
+        <input type="number" id="id" min="1">
+    </label>
+    <label>Medicine Name:
+        <input type="text" id="name" required>
+    </label>
+    <label>Expiry Date:
+        <input type="date" id="expiry_date" required>
+    </label>
+    <label>Quantity:
+        <input type="number" id="quantity" min="1" required>
+    </label>
+    <label>Price (Rs):
+        <input type="number" id="price" min="0" step="0.01" required>
+    </label>
+    <button type="submit">Add Medicine</button>
+</form>
+
+<script>
+document.getElementById('addMedicineForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const name = document.getElementById('name').value.trim();
+    const expiry = new Date(document.getElementById('expiry_date').value);
+    const today = new Date();
+    const quantity = parseInt(document.getElementById('quantity').value);
+    const price = parseFloat(document.getElementById('price').value);
+
+    // Extra validation
+    if (!name) {
+        alert("Medicine name cannot be empty!");
+        return;
+    }
+    if (expiry <= today) {
+        alert("Expiry date must be in the future!");
+        return;
+    }
+    if (quantity <= 0) {
+        alert("Quantity must be greater than 0!");
+        return;
+    }
+    if (price <= 0) {
+        alert("Price must be greater than 0!");
+        return;
+    }
+
+    const idValue = document.getElementById('id').value;
+    const data = {
+        id: idValue ? parseInt(idValue) : null,
+        name: name,
+        expiry_date: document.getElementById('expiry_date').value,
+        quantity: quantity,
+        price: price,
+        added_date: new Date().toISOString()
+    };
+
+    try {
+        const response = await fetch('http://127.0.0.1:8000/add_med', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+
+        if (response.ok) {
+            const result = await response.json();
+            alert(`✅ Medicine Added Successfully!\nID: ${result.id}`);
+            document.getElementById('addMedicineForm').reset();
+        } else {
+            const error = await response.json();
+            alert('❌ Failed to Add Medicine: ' + (error.detail || 'Unknown error'));
+        }
+    } catch (err) {
+        alert('⚠️ Network error: ' + err.message);
+    }
+});
+</script>
+
+<footer>&copy; 2025 Medical Store | Nandhakumar</footer>
+</body>
+</html>

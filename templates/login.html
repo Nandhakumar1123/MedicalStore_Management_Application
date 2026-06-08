@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url('/static/med1.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+            background-attachment: fixed;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            background: linear-gradient(90deg, #0044cc, #0066ff);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 22px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        }
+
+        .tagline {
+            margin-top: 5px;
+            font-size: 16px;
+            font-weight: normal;
+            color: #e6e6e6;
+        }
+
+        .login-wrapper {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 1.5s ease-in-out;
+        }
+
+        .login-container {
+            background-color: rgba(255, 255, 255, 0.95);
+            padding: 35px 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            width: 340px;
+            text-align: center;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .login-container:hover {
+            transform: translateY(-5px);
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            margin-bottom: 18px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: border 0.3s;
+        }
+
+        input:focus {
+            border: 1px solid #0066ff;
+            outline: none;
+            box-shadow: 0 0 6px rgba(0, 102, 255, 0.3);
+        }
+
+        button {
+            background: linear-gradient(90deg, #0044cc, #0066ff);
+            border: none;
+            padding: 12px;
+            width: 100%;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.2s;
+        }
+
+        button:hover {
+            background: linear-gradient(90deg, #0033aa, #0055dd);
+            transform: scale(1.05);
+        }
+
+        .error {
+            color: red;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .links {
+            margin-top: 12px;
+            font-size: 14px;
+        }
+
+        .links a {
+            color: #0044cc;
+            text-decoration: none;
+            margin: 0 5px;
+        }
+
+        .links a:hover {
+            text-decoration: underline;
+        }
+
+        footer {
+            text-align: center;
+            padding: 15px;
+            background: linear-gradient(90deg, #0044cc, #0066ff);
+            color: white;
+            font-size: 14px;
+            letter-spacing: 0.5px;
+        }
+
+        .logo {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            margin-bottom: 20px;
+            border: 3px solid #0066ff;
+            box-shadow: 0 0 10px rgba(0, 102, 255, 0.4);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Welcome to Medical Store!</h1>
+        <div class="tagline">Your trusted digital pharmacy solution 💊</div>
+    </header>
+
+    <div class="login-wrapper">
+        <form class="login-container" method="post" action="/login" onsubmit="return validateLogin()">
+            <img src="{{ url_for('static', path='logo.jpg') }}" alt="Medical Store Logo" class="logo" />
+            <h2>Login</h2>
+            {% if error %}
+            <div class="error">{{ error }}</div>
+            {% endif %}
+            <input type="text" id="username" name="username" placeholder="Username" required />
+            <input type="password" id="password" name="password" placeholder="Password" required />
+            <button type="submit">Log In</button>
+
+            <div class="links">
+                
+                <a href="/forgot-password">Forgot Password?</a>
+            </div>
+        </form>
+    </div>
+
+    <footer>
+        &copy; 2025 Medical Store | Nandhakumar <br>
+        📧 support@medicalstore.com | 📞 +91-9876543210
+    </footer>
+
+    <script>
+        function validateLogin() {
+            const username = document.getElementById("username").value.trim();
+            const password = document.getElementById("password").value.trim();
+
+            if (username.length < 3) {
+                alert("Username must be at least 3 characters long.");
+                return false;
+            }
+            if (password.length < 5) {
+                alert("Password must be at least 5 characters long.");
+                return false;
+            }
+            return true;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,100 @@
+
+<html>
+<head>
+    <title>Medical Store Management</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: "Segoe UI", sans-serif;
+        }
+        body {
+            background: #e6f7ff;
+            color: #333;
+            margin: 0;
+        }
+        header {
+            background-color: #007acc;
+            padding: 20px;
+            text-align: center;
+            color: white;
+        }
+        nav ul {
+            display: flex;
+            justify-content: center;
+            padding: 0;
+            list-style: none;
+            margin-top: 10px;
+        }
+        nav ul li {
+            margin: 0 15px;
+        }
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        nav ul li a:hover {
+            text-decoration: underline;
+        }
+        .main {
+            display: flex;
+            justify-content: space-around;
+            padding: 50px 20px;
+            flex-wrap: wrap;
+        }
+        .card {
+            background-color: white;
+            width: 250px;
+            padding: 30px;
+            margin: 20px;
+            border-radius: 15px;
+            text-align: center;
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 25px rgba(0,123,204,0.4);
+        }
+        footer {
+            text-align: center;
+            padding: 15px;
+            background-color: #007acc;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Medical Store</h1>
+        <nav>
+            <ul>
+                <li><a href="C:\Users\crazy\OneDrive\Desktop\summerintern\templates\dashboard.html">Dashboard</a></li>
+                <li><a href="C:\Users\crazy\OneDrive\Desktop\summerintern\templates\medicines.html">Medicines</a></li>
+                <li><a href="C:\Users\crazy\OneDrive\Desktop\summerintern\templates\billing.html">Billing</a></li>
+                <li><a href="C:\Users\crazy\OneDrive\Desktop\summerintern\templates\report.html">Reports</a></li>
+            </ul>
+        </nav>
+    </header>
+    <section class="main">
+        <div class="card" onclick="location.href='add_med.html'">
+            <div class="icon">💊</div>
+            <h3>Add Medicine</h3>
+            <p>Insert new Medicines Entry into the system...</p>
+        </div>
+        <div class="card" onclick="location.href='billing.html'">
+            <div class="icon">🧾</div>
+            <h3>Billing</h3>
+            <p>Generating the Bill</p>
+        </div>
+        <div class="card" onclick="location.href='report.html'">
+            <div class="icon">📊</div>
+            <h3>Reports</h3>
+            <p>Check Sales, Stocks and Expiry Reports</p>
+        </div>
+    </section>
+    <footer>
+        &copy; 2025 Medical Store | Nandhakumar
+    </footer>
+</body>
+</html>
